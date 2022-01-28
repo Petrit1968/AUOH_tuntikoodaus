@@ -4,12 +4,15 @@ const PORT = process.env.PORT || 8081;
 let app = express();
 
 
+
 app.get("/robot/joint_values/", (req, res, next) => {
     axios.get('https://fanuc-robot-http-server.herokuapp.com/').then(
-        (res)=>{
+        (robot_res)=>{
             const regexp = 'Joint   [1-6]: *(-?.*)';
+            console.log(regexp);
             let joint_values = [];
-            let matches = res.data.matchAll(regexp);
+            let matches = robot_res.data.matchAll(regexp);
+            console.log(matches.length);
             let count = 0;
             for (const match of matches) {
                 count++;
