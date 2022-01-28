@@ -3,8 +3,6 @@ const express = require('express');
 const PORT = process.env.PORT || 8081;
 let app = express();
 
-
-
 app.get("/robot/joint_values/", (req, res, next) => {
     axios.get('https://fanuc-robot-http-server.herokuapp.com/').then(
         (robot_res)=>{
@@ -20,7 +18,7 @@ app.get("/robot/joint_values/", (req, res, next) => {
                 const value = parseFloat(match[1]);
                 joint_values.push(value);
                 }
-
+            console.log(joint_values)
             res.send(joint_values);
         }
     );
