@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const server = require("http").createServer(express);
+const server = require("http").createServer(app);
 const io = require("socket.io")(server);
 
 const PORT = process.env.PORT || 8081;
@@ -19,7 +19,8 @@ io.on("connection", (socket)=>{
   
     })
 
-})
+});
 
+app.use(express.static("public"));
 server.listen(PORT);
 
