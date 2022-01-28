@@ -18,6 +18,7 @@ app.get("/robot/joint_values/", (req, res, next) => {
                 const value = parseFloat(match[1]);
                 joint_values.push(value);
                 }
+                
             console.log(joint_values)
             res.send(joint_values);
         }
