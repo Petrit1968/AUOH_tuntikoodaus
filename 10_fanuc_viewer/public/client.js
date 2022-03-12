@@ -167,7 +167,7 @@ const render = ()=>{
 render();
 
 
-let socket = io("https://fanuc-wsserver.herokuapp.com/", {withCredentials: false});
+let socket = io("https://fanuc-ws-server29.herokuapp.com/", {withCredentials: false});
 
 socket.on("joint_values", (joint_values) =>{
     //console.log(joint_values);
