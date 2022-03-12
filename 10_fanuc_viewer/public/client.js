@@ -2,6 +2,8 @@ import * as THREE from "three";
 import {OrbitControls} from "/OrbitControls.js";
 import {STLLoader} from "/STLLoader.js";
 
+let socket = io("https://fanuc-ws-server29.herokuapp.com/", {withCredentials: false});
+
 const scene = new THREE.Scene();
 const renderer = new THREE.WebGLRenderer();
 
@@ -59,6 +61,14 @@ let default_material = new THREE.MeshPhongMaterial({
     color: 0x0000ff
 });
 
+let dark_material = new THREE.MeshPhongMaterial({
+    color: 0x555555
+});
+
+let yellow_material = new THREE.MeshPhongMaterial({
+    color: 0xffff00
+});
+
 const stl_loader = new STLLoader();
 const load_stl = (url)=>{
     return new Promise((resolve)=>{
@@ -74,32 +84,34 @@ const load_geometries = async ()=>{
     {
         let geometry = await load_stl("./FANUC_R2000iA165F-STL/BASE.stl");
         geometry.scale(0.001, 0.001, 0.001);
-        joints.push(new THREE.Mesh(geometry, default_material));
+        joints.push(new THREE.Mesh(geometry, dark_material));
     }
     {
         let geometry = await load_stl("./FANUC_R2000iA165F-STL/J1-1.stl");
+        let geometry2 = await load_stl("./FANUC_R2000iA165F-STL/J1-2.stl");
+        geometry.merge(geometry2);
         geometry.scale(0.001, 0.001, 0.001);
-        joints.push(new THREE.Mesh(geometry, default_material));
+        joints.push(new THREE.Mesh(geometry, yellow_material));
     }
     {
         let geometry = await load_stl("./FANUC_R2000iA165F-STL/J2.stl");
         geometry.scale(0.001, 0.001, 0.001);
-        joints.push(new THREE.Mesh(geometry, default_material));
+        joints.push(new THREE.Mesh(geometry, yellow_material));
     }
     {
         let geometry = await load_stl("./FANUC_R2000iA165F-STL/J3.stl");
         geometry.scale(0.001, 0.001, 0.001);
-        joints.push(new THREE.Mesh(geometry, default_material));
+        joints.push(new THREE.Mesh(geometry, yellow_material));
     }
     {
         let geometry = await load_stl("./FANUC_R2000iA165F-STL/J4.stl");
         geometry.scale(0.001, 0.001, 0.001);
-        joints.push(new THREE.Mesh(geometry, default_material));
+        joints.push(new THREE.Mesh(geometry, yellow_material));
     }
     {
         let geometry = await load_stl("./FANUC_R2000iA165F-STL/J5.stl");
         geometry.scale(0.001, 0.001, 0.001);
-        joints.push(new THREE.Mesh(geometry, default_material));
+        joints.push(new THREE.Mesh(geometry, yellow_material));
     }
 };
 
@@ -149,25 +161,16 @@ load_geometries().then(()=>{
     joints[4].add(offsets[4]);
     offsets[4].add(joints[5]);
 
-
-    //joints[2].rotation.set(0,0,THREE.Math.degToRad(45));
-    //joints[4].rotation.set(0,0,THREE.Math.degToRad(45));
-
-    // Math.degToRad
-    
-    //joints[0].add(joints[1]);
-    //joints[1].add(joints[2]);
+    socket.on("joint_values", (joint_values) =>{
+        joints[1].rotation.set(0, THREE.Math.degToRad(joint_values[0]),0);
+        joints[2].rotation.set(0, 0, THREE.Math.degToRad(joint_values[1]));
+        joints[3].rotation.set(0, 0, THREE.Math.degToRad(joint_values[2]-joint_values[1]));
+        joints[4].rotation.set(THREE.Math.degToRad(joint_values[3]),0, 0);
+        joints[5].rotation.set(0, 0, THREE.Math.degToRad(joint_values[4]));
+        //console.log(joint_values);
+    });
 
 });
-
-// {
-//     load_stl("./FANUC_R2000iA165F-STL/BASE.stl").then( (geometry)=>{
-//         geometry.scale(0.001, 0.001, 0.001);
-//         let mesh = new THREE.Mesh(geometry, default_material);
-//         scene.add(mesh);
-//     } );
-// }
-
 
 const render = ()=>{
     renderer.render(scene, camera);
@@ -175,10 +178,3 @@ const render = ()=>{
     requestAnimationFrame(render);
 };
 render();
-
-
-let socket = io("https://fanuc-ws-server29.herokuapp.com/", {withCredentials: false});
-
-socket.on("joint_values", (joint_values) =>{
-    //console.log(joint_values);
-});
