@@ -45,8 +45,19 @@ const api_put_alarm = (req, res) => {
     });
 };
 
+//DELETE
+
+const api_delete_alarm = (req, res) => {
+    const id = req.params.id;
+    alarm_model.findByIdAndDelete(id).then(()=>{
+        console.log()
+        res.send();
+    });
+};
+
 
 module.exports.api_post_alarm = api_post_alarm;
 module.exports.api_get_alarms = api_get_alarms;
 module.exports.api_get_alarm = api_get_alarm;
 module.exports.api_put_alarm = api_put_alarm;
+module.exports.api_delete_alarm = api_delete_alarm;
